@@ -1,0 +1,7 @@
+cd ai-quick-meals
+git init
+git add .
+git commit -m "First commit - AI Meals App"
+git branch -M main
+git remote add origin https://github.com/iconballer99/ai-quick-meals.git
+git push -u origin main
