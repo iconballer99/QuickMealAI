@@ -1,0 +1,191 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
+import { Clock, ChefHat } from "lucide-react";
+
+const sampleFeed = [
+  {
+    title: "15-Min Power Bowl",
+    time: "15 min",
+    nutrition: "410 cal | 25g protein | 35g carbs | 12g fat",
+    steps: ["Cook quinoa base.", "Grill chicken strips.", "Top with veggies & hummus."],
+    video: "https://www.w3schools.com/html/mov_bbb.mp4"
+  },
+  {
+    title: "Avocado Toast Energy Boost",
+    time: "7 min",
+    nutrition: "280 cal | 9g protein | 28g carbs | 15g fat",
+    steps: ["Toast whole grain bread.", "Smash avocado with lemon.", "Top with egg & chili flakes."],
+    video: "https://www.w3schools.com/html/movie.mp4"
+  },
+  {
+    title: "Berry Protein Smoothie",
+    time: "5 min",
+    nutrition: "220 cal | 20g protein | 25g carbs | 3g fat",
+    steps: ["Blend frozen berries.", "Add protein powder.", "Mix with almond milk & chia seeds."],
+    video: "https://www.w3schools.com/html/mov_bbb.mp4"
+  }
+];
+
+export default function QuickFuelApp() {
+  const [ingredients, setIngredients] = useState("");
+  const [recipe, setRecipe] = useState(null);
+  const [expandedFeedItem, setExpandedFeedItem] = useState(null);
+
+  const generateRecipe = () => {
+    // Mock AI Recipe Output
+    setRecipe({
+      title: "Spinach & Egg Power Wrap",
+      time: "12 min",
+      steps: [
+        "Whisk 2 eggs with seasoning.",
+        "Sauté spinach in olive oil.",
+        "Add eggs, scramble lightly.",
+        "Wrap in a whole wheat tortilla with avocado."
+      ],
+      nutrition: "320 cal | 20g protein | 10g carbs | 14g fat"
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-red-600 to-black flex flex-col items-center p-6 text-white">
+      <motion.h1 
+        initial={{ opacity: 0, y: -20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        className="text-3xl font-bold mb-6"
+      >
+        QuickFuel ⚡ AI Meals
+      </motion.h1>
+
+      {/* AI Meal Generator */}
+      <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-0 mb-6">
+        <CardContent className="p-4">
+          <p className="mb-2 text-lg font-semibold">What’s in your fridge?</p>
+          <Input 
+            placeholder="e.g. eggs, spinach, avocado" 
+            value={ingredients}
+            onChange={(e) => setIngredients(e.target.value)}
+            className="mb-3 bg-white text-black"
+          />
+          <Button className="w-full bg-red-500 hover:bg-red-700" onClick={generateRecipe}>
+            Generate Meal
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* AI Generated Recipe */}
+      {recipe && (
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }} 
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md mb-8"
+        >
+          <Card className="bg-white text-black rounded-2xl shadow-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <ChefHat className="w-6 h-6 text-red-500" /> {recipe.title}
+                </h2>
+                <span className="flex items-center text-sm text-gray-600"><Clock className="w-4 h-4 mr-1" /> {recipe.time}</span>
+              </div>
+              <p className="text-sm text-gray-700 mb-3">{recipe.nutrition}</p>
+              <ul className="list-decimal list-inside space-y-1 text-sm">
+                {recipe.steps.map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Scrollable Short-Form Feed with Video + Swipe for Full Recipe */}
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }}
+        className="w-full max-w-md space-y-6"
+      >
+        {sampleFeed.map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+          >
+            <Card 
+              className="overflow-hidden rounded-2xl shadow-lg cursor-pointer group relative"
+              onClick={() => setExpandedFeedItem(index)}
+            >
+              <video 
+                src={item.video} 
+                controls={false}
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                className="w-full h-64 object-cover"
+              />
+              {/* Swipe overlay */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <p className="text-white text-sm text-center">⬆️ Swipe up for full recipe</p>
+              </div>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <ChefHat className="w-5 h-5 text-red-500" /> {item.title}
+                  </h2>
+                  <span className="flex items-center text-sm text-gray-600"><Clock className="w-4 h-4 mr-1" /> {item.time}</span>
+                </div>
+                <p className="text-xs text-gray-700 mb-2">{item.nutrition}</p>
+                <ul className="list-disc list-inside text-xs text-gray-800 space-y-1">
+                  {item.steps.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Expanded Fullscreen Recipe */}
+            {expandedFeedItem === index && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6"
+              >
+                <Card className="w-full max-w-lg bg-white text-black rounded-2xl overflow-y-auto max-h-full shadow-2xl">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-2xl font-bold flex items-center gap-2">
+                        <ChefHat className="w-6 h-6 text-red-500" /> {item.title}
+                      </h2>
+                      <Button variant="ghost" onClick={() => setExpandedFeedItem(null)}>❌</Button>
+                    </div>
+                    <video 
+                      src={item.video}
+                      controls
+                      autoPlay
+                      loop
+                      muted={false}
+                      playsInline
+                      className="w-full rounded-xl mb-4"
+                    />
+                    <p className="text-sm text-gray-700 mb-3">{item.nutrition}</p>
+                    <ul className="list-decimal list-inside space-y-2 text-sm">
+                      {item.steps.map((step, i) => (
+                        <li key={i}>{step}</li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
